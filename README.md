@@ -1,6 +1,21 @@
 # DevPulse AI
 
-AI-generated standup summaries from a GitHub repo's real recent activity (commits, PRs, issues) — a scaled-down clone of Troopr's "Check-ins" feature.
+DevPulse AI turns a GitHub repository's raw activity into an engineering standup that writes itself. Point it at a repo, and it reads real commits, pull requests, and issues over a chosen time window, then has an LLM synthesize that activity into a structured update — what shipped, what's in flight, and what's stuck — instead of an engineer manually reconstructing the week from memory.
+
+It's built as an AI-native product rather than an AI feature bolted onto a CRUD app: the model is given only grounded, real activity data and instructed never to fabricate beyond it, its output is parsed into a strict schema with a graceful fallback when the model misbehaves, and every summary is persisted so a team's history of progress is queryable over time, not lost in a chat scrollback.
+
+## How it works
+
+```
+React (Vite) frontend  →  Express/Node API  →  GitHub REST API   (recent commits, PRs, issues)
+                                             →  Gemini API        (structured synthesis)
+                                             →  MongoDB           (persisted summary history)
+```
+
+1. **Track a repo** — add any `owner/name` to watch.
+2. **Fetch, don't guess** — the backend pulls only the requested time window (1/3/7 days) directly from GitHub's API, deduplicating pull requests out of the issues feed and shaping everything down to what's actually relevant.
+3. **Synthesize, don't hallucinate** — that data is handed to Gemini with an explicit instruction to summarize only what's present, returned as strict JSON (highlights / in-progress / blockers / narrative). Malformed model output is caught and degrades gracefully instead of erroring out.
+4. **Persist and revisit** — every summary is stored against its repo, building a running history of a team's actual velocity over time.
 
 ## Stack
 

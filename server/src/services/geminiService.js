@@ -1,6 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const MODEL_NAME = "gemini-2.0-flash";
+const MODEL_NAME = "gemini-flash-lite-latest";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
 
 function buildPrompt(owner, name, windowDays, activity) {
   return `You are generating a concise engineering standup summary for the GitHub repository ${owner}/${name}, covering the last ${windowDays} day(s).
@@ -46,12 +45,21 @@ export async function generateSummary(owner, name, windowDays, activity) {
     throw new Error("GEMINI_API_KEY is not set");
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
   const prompt = buildPrompt(owner, name, windowDays, activity);
-  const result = await model.generateContent(prompt);
-  const rawText = result.response.text();
+
+  const res = await fetch(`${API_URL}?key=${apiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Gemini API request failed: ${res.status} ${body.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
   try {
     const parsed = JSON.parse(stripCodeFences(rawText));
