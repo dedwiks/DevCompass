@@ -4,6 +4,10 @@ DevPulse AI turns a GitHub repository's raw activity into an engineering standup
 
 It's built as an AI-native product rather than an AI feature bolted onto a CRUD app: the model is given only grounded, real activity data and instructed never to fabricate beyond it, its output is parsed into a strict schema with a graceful fallback when the model misbehaves, and every summary is persisted so a team's history of progress is queryable over time, not lost in a chat scrollback.
 
+**Live:** [dev-compass-kzed.vercel.app](https://dev-compass-kzed.vercel.app/)
+
+![DevPulse AI dashboard](docs/screenshot.png)
+
 ## How it works
 
 ```
