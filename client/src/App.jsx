@@ -53,7 +53,17 @@ export default function App() {
           <h1>devpulse</h1>
           <span className="tagline">standup summaries from repo activity</span>
         </div>
-        <span className="badge">{repos.length} repo{repos.length === 1 ? "" : "s"} tracked</span>
+        <div className="header-right">
+          <a
+            className="companion-link"
+            href="https://task-it-three.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            TaskIt (Slack bot) →
+          </a>
+          <span className="badge">{repos.length} repo{repos.length === 1 ? "" : "s"} tracked</span>
+        </div>
       </header>
       <div className="app-body">
         <Sidebar
